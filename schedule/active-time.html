@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Time</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060810;
+  --s1: #0d1018;
+  --s2: #131722;
+  --s3: #1a1f2e;
+  --border: #1e2538;
+  --text: #e8eaf6;
+  --muted: #6b7399;
+  --a1: #4f8ef7;
+  --a2: #f7c948;
+  --a3: #4fd1a5;
+  --a4: #f7654f;
+  --a5: #b44ff7;
+  --r: 14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;animation:fadeIn .35s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════
+   PROFILE SELECT SCREEN
+══════════════════════════════ */
+#profileScreen{
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+  position:relative;
+  overflow:hidden;
+}
+#profileScreen::before{
+  content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);
+  width:700px;height:700px;
+  background:radial-gradient(ellipse,rgba(79,142,247,.07) 0%,transparent 65%);
+  pointer-events:none
+}
+#profileScreen::after{
+  content:'';position:absolute;bottom:-80px;right:-80px;
+  width:400px;height:400px;
+  background:radial-gradient(ellipse,rgba(79,209,165,.05) 0%,transparent 65%);
+  pointer-events:none
+}
+
+.brand{text-align:center;margin-bottom:52px}
+.brand-logo{
+  font-family:'Syne',sans-serif;
+  font-size:48px;font-weight:800;
+  background:linear-gradient(135deg,var(--a1),var(--a3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-2px;line-height:1
+}
+.brand-tagline{font-size:13px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:8px}
+
+.profiles-label{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;text-align:center}
+.profiles-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:16px;max-width:640px;width:100%;margin-bottom:24px
+}
+
+.profile-card{
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px 16px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .25s;
+  position:relative;
+  overflow:hidden;
+}
+.profile-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--card-color,var(--a1)),transparent);
+  opacity:0;transition:opacity .25s;border-radius:20px
+}
+.profile-card:hover{transform:translateY(-4px);border-color:var(--card-color,var(--a1));box-shadow:0 16px 40px rgba(0,0,0,.4)}
+.profile-card:hover::before{opacity:.08}
+
+.profile-avatar{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin:0 auto 12px;
+  background:rgba(255,255,255,.05);
+  border:2px solid var(--card-color,var(--a1));
+  transition:all .25s;
+}
+.profile-card:hover .profile-avatar{box-shadow:0 0 20px var(--card-color,var(--a1))}
+.profile-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.profile-tasks{font-size:11px;color:var(--muted);margin-top:4px}
+
+.profile-del{
+  position:absolute;top:8px;right:8px;
+  background:rgba(247,101,79,.12);border:none;border-radius:6px;
+  color:var(--a4);font-size:12px;padding:3px 7px;cursor:pointer;
+  opacity:0;transition:opacity .2s;
+}
+.profile-card:hover .profile-del{opacity:1}
+
+.add-profile-card{
+  background:transparent;
+  border:1.5px dashed var(--border);
+  border-radius:20px;padding:24px 16px;
+  text-align:center;cursor:pointer;
+  transition:all .25s;
+}
+.add-profile-card:hover{border-color:var(--a1);background:rgba(79,142,247,.04)}
+.add-profile-icon{font-size:32px;margin-bottom:10px;color:var(--muted)}
+.add-profile-text{font-size:13px;color:var(--muted)}
+
+/* New profile modal */
+.np-modal{
+  position:fixed;inset:0;background:rgba(6,8,16,.85);backdrop-filter:blur(10px);
+  z-index:200;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s
+}
+.np-modal.open{opacity:1;pointer-events:all}
+.np-box{
+  background:var(--s2);border:1px solid var(--border);border-radius:24px;
+  padding:36px;width:400px;max-width:95vw;
+  transform:scale(.95) translateY(10px);transition:transform .3s
+}
+.np-modal.open .np-box{transform:scale(1) translateY(0)}
+.np-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:24px}
+
+.form-group{margin-bottom:18px}
+.form-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:8px}
+.form-input,.form-select{
+  width:100%;background:var(--s3);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color .2s
+}
+.form-input:focus,.form-select:focus{border-color:var(--a1)}
+.form-select option{background:var(--s3)}
+
+.emoji-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.emoji-opt{
+  width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--s3);cursor:pointer;font-size:18px;transition:all .2s;
+  display:flex;align-items:center;justify-content:center
+}
+.emoji-opt:hover,.emoji-opt.sel{border-color:var(--a1);background:rgba(79,142,247,.12)}
+
+.color-picker{display:flex;gap:8px;margin-top:6px}
+.color-opt{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
+.color-opt.sel{border-color:white;transform:scale(1.2)}
+
+.modal-actions{display:flex;gap:10px;margin-top:24px;justify-content:flex-end}
+.btn-cancel{
+  padding:10px 20px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;
+  font-size:14px;cursor:pointer;transition:all .2s
+}
+.btn-cancel:hover{border-color:var(--muted);color:var(--text)}
+.btn-primary{
+  padding:10px 24px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--a1),#3a7de8);
+  color:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(79,142,247,.3)}
+
+/* ══════════════════════════════
+   MAIN APP SCREEN
+══════════════════════════════ */
+#appScreen{flex-direction:row}
+
+/* SIDEBAR */
+.sidebar{
+  width:252px;background:var(--s1);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:24px 16px;
+  position:sticky;top:0;height:100vh;overflow-y:auto
+}
+
+.app-brand{
+  font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
+  background:linear-gradient(135deg,var(--a1),var(--a3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:24px;letter-spacing:-0.5px
+}
+
+.current-profile{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:12px;padding:12px;margin-bottom:24px;cursor:pointer;
+  transition:all .2s;
+}
+.current-profile:hover{border-color:var(--a1)}
+.cp-avatar{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;border:2px solid var(--profile-color,var(--a1))
+}
+.cp-info{flex:1;min-width:0}
+.cp-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-switch{font-size:11px;color:var(--muted)}
+.cp-arrow{color:var(--muted);font-size:14px}
+
+.nav-section{margin-bottom:24px}
+.nav-section-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;padding:0 8px;margin-bottom:8px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;
+  color:var(--muted);transition:all .2s;margin-bottom:2px;
+  border:1px solid transparent;
+}
+.nav-item:hover{background:var(--s2);color:var(--text)}
+.nav-item.active{background:rgba(79,142,247,.1);color:var(--a1);border-color:rgba(79,142,247,.15)}
+.nav-icon{width:22px;text-align:center;font-size:16px}
+
+/* score widget */
+.score-widget{
+  margin-top:auto;border-radius:16px;padding:18px;
+  background:linear-gradient(135deg,rgba(79,209,165,.08),rgba(79,142,247,.06));
+  border:1px solid rgba(79,209,165,.15)
+}
+.sw-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.sw-stars{display:flex;gap:3px;margin-bottom:4px}
+.sw-star{font-size:18px;color:var(--border)}
+.sw-star.lit{color:var(--a2)}
+.sw-note{font-size:12px;color:var(--muted)}
+
+/* MAIN */
+.main{flex:1;padding:28px 32px;overflow-y:auto}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.top-left .view-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px}
+.top-left .view-sub{font-size:12px;color:var(--muted);margin-top:3px}
+
+.add-btn{
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--a1),#3a7de8);
+  border:none;border-radius:11px;padding:11px 22px;
+  color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s
+}
+.add-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,142,247,.35)}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px;position:relative;overflow:hidden
+}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.stat-ico{font-size:20px}
+.stat-badge{
+  font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;letter-spacing:.5px
+}
+.stat-badge.up{background:rgba(79,209,165,.12);color:var(--a3)}
+.stat-badge.down{background:rgba(247,101,79,.12);color:var(--a4)}
+.stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.stat-bar{height:3px;background:var(--s3);border-radius:2px;margin-top:14px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:2px;transition:width .8s}
+
+/* CONTENT */
+.content-grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
+
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.panel-hd{
+  padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between
+}
+.panel-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}
+
+/* FILTERS */
+.flt-wrap{display:flex;gap:6px}
+.flt{
+  padding:5px 13px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-size:11px;font-weight:700;
+  font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.5px;text-transform:uppercase
+}
+.flt.active{background:var(--a1);border-color:var(--a1);color:white}
+.flt:hover:not(.active){border-color:var(--muted);color:var(--text)}
+
+/* TASKS */
+.task-list{padding:12px 16px}
+.task-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:13px 8px;border-bottom:1px solid rgba(30,37,56,.7);
+  animation:slideIn .3s ease
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.task-item:last-child{border-bottom:none}
+
+.prio-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.prio-high{background:var(--a4);box-shadow:0 0 6px rgba(247,101,79,.6)}
+.prio-mid{background:var(--a2);box-shadow:0 0 6px rgba(247,201,72,.5)}
+.prio-low{background:var(--muted)}
+
+.task-cb{
+  width:20px;height:20px;border-radius:6px;border:2px solid var(--border);
+  flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;margin-top:1px;background:transparent
+}
+.task-cb:hover{border-color:var(--a3)}
+.task-cb.done{background:var(--a3);border-color:var(--a3)}
+.task-cb.done::after{content:'✓';font-size:11px;color:#060810;font-weight:800}
+
+.task-body{flex:1}
+.task-text{font-size:14px;font-weight:600;line-height:1.5;transition:all .2s}
+.task-text.done{text-decoration:line-through;color:var(--muted)}
+.task-desc{font-size:12px;color:var(--muted);margin-top:3px}
+.task-meta{display:flex;gap:6px;margin-top:7px;align-items:center;flex-wrap:wrap}
+
+.tag{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.tag-ish{background:rgba(79,142,247,.1);color:var(--a1)}
+.tag-shaxsiy{background:rgba(247,201,72,.1);color:var(--a2)}
+.tag-soglik{background:rgba(79,209,165,.1);color:var(--a3)}
+.tag-oila{background:rgba(247,101,79,.1);color:var(--a4)}
+.tag-boshqa{background:rgba(180,79,247,.1);color:var(--a5)}
+
+.task-date{font-size:11px;color:var(--muted)}
+.task-actions{display:flex;gap:4px;opacity:0;transition:opacity .2s}
+.task-item:hover .task-actions{opacity:1}
+.act-btn{
+  background:transparent;border:none;cursor:pointer;
+  font-size:14px;padding:4px 6px;border-radius:6px;color:var(--muted);transition:all .2s
+}
+.act-btn:hover{background:rgba(247,101,79,.12);color:var(--a4)}
+
+/* EMPTY */
+.empty{text-align:center;padding:44px 20px}
+.empty-ico{font-size:44px;margin-bottom:14px}
+.empty-txt{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* RIGHT PANEL */
+.right-col{display:flex;flex-direction:column;gap:16px}
+
+/* PROGRESS */
+.prog-wrap{padding:18px 22px}
+.prog-item{margin-bottom:16px}
+.prog-item:last-child{margin-bottom:0}
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.prog-name{font-size:13px;font-weight:700}
+.prog-pct{font-size:12px;color:var(--muted)}
+.prog-bar{height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+
+/* REMINDERS */
+.rem-list{padding:12px 16px}
+.rem-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  border-radius:10px;background:var(--s2);margin-bottom:8px;
+  border-left:3px solid var(--a1);position:relative
+}
+.rem-item:nth-child(even){border-left-color:var(--a3)}
+.rem-ico{font-size:16px}
+.rem-body{flex:1}
+.rem-text{font-size:13px;font-weight:600}
+.rem-time{font-size:11px;color:var(--muted);margin-top:2px}
+.rem-del{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:14px;padding:2px 5px;border-radius:5px;transition:all .2s;opacity:0
+}
+.rem-item:hover .rem-del{opacity:1}
+.rem-del:hover{background:rgba(247,101,79,.15);color:var(--a4)}
+
+/* EVAL */
+.eval-wrap{padding:18px 22px}
+.eval-q{font-size:13px;color:var(--muted);margin-bottom:14px}
+.eval-stars{display:flex;gap:5px;margin-bottom:12px}
+.eval-star{font-size:26px;cursor:pointer;transition:all .2s;color:var(--s3);line-height:1}
+.eval-star:hover,.eval-star.lit{color:var(--a2);transform:scale(1.15)}
+.eval-msg{font-size:13px;color:var(--a3);font-weight:600;min-height:18px}
+
+/* ADD TASK MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(6,8,16,.88);backdrop-filter:blur(10px);
+  z-index:150;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{
+  background:var(--s2);border:1px solid var(--border);border-radius:22px;padding:30px;
+  width:480px;max-width:96vw;
+  transform:scale(.95) translateY(12px);transition:transform .3s
+}
+.modal-overlay.open .modal-box{transform:scale(1) translateY(0)}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:22px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-textarea{
+  width:100%;background:var(--s3);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:14px;outline:none;
+  resize:vertical;min-height:70px;transition:border-color .2s
+}
+.form-textarea:focus{border-color:var(--a1)}
+
+/* REM MODAL */
+.rem-modal{position:fixed;inset:0;background:rgba(6,8,16,.88);backdrop-filter:blur(10px);z-index:150;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.rem-modal.open{opacity:1;pointer-events:all}
+.rem-modal .modal-box{transform:scale(.95) translateY(12px)}
+.rem-modal.open .modal-box{transform:scale(1) translateY(0)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:28px;right:28px;
+  background:var(--s2);border:1px solid var(--border);border-radius:12px;
+  padding:13px 18px;font-size:13px;font-weight:600;color:var(--text);
+  z-index:300;display:flex;align-items:center;gap:9px;
+  transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* RESPONSIVE */
+@media(max-width:920px){.content-grid{grid-template-columns:1fr}.right-col{display:grid;grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.stats-row{grid-template-columns:repeat(2,1fr)}.sidebar{width:200px}.main{padding:18px}}
+@media(max-width:560px){#appScreen{flex-direction:column}.sidebar{width:100%;height:auto;position:static}.main{padding:16px}.right-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ════ PROFILE SCREEN ════ -->
+<div id="profileScreen" class="screen active">
+  <div class="brand">
+    <div class="brand-logo">Active Time</div>
+    <div class="brand-tagline">Vaqtingizni faol boshqaring</div>
+  </div>
+  <div class="profiles-label">Profilingizni tanlang</div>
+  <div class="profiles-grid" id="profilesGrid"></div>
+  <div style="font-size:12px;color:var(--muted);margin-top:8px">Profilni o'chirish uchun ustiga bosing → ✕</div>
+</div>
+
+<!-- ════ NEW PROFILE MODAL ════ -->
+<div class="np-modal" id="npModal">
+  <div class="np-box">
+    <div class="np-title">Yangi profil</div>
+    <div class="form-group">
+      <label class="form-label">Ism</label>
+      <input class="form-input" id="npName" placeholder="Isming..." maxlength="20" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Avatar tanlang</label>
+      <div class="emoji-picker" id="emojiPicker"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Rang tanlang</label>
+      <div class="color-picker" id="colorPicker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNpModal()">Bekor</button>
+      <button class="btn-primary" onclick="createProfile()">Yaratish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MAIN APP SCREEN ════ -->
+<div id="appScreen" class="screen">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="app-brand">⚡ Active Time</div>
+
+    <div class="current-profile" onclick="goToProfiles()" title="Profil almashtirish">
+      <div class="cp-avatar" id="cpAvatar">👤</div>
+      <div class="cp-info">
+        <div class="cp-name" id="cpName">—</div>
+        <div class="cp-switch">Profil almashtirish</div>
+      </div>
+      <div class="cp-arrow">⇄</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Ko'rinish</div>
+      <div class="nav-item active" onclick="setView('kunlik',this)"><span class="nav-icon">☀️</span>Kunlik</div>
+      <div class="nav-item" onclick="setView('haftalik',this)"><span class="nav-icon">📅</span>Haftalik</div>
+      <div class="nav-item" onclick="setView('oylik',this)"><span class="nav-icon">🗓️</span>Oylik</div>
+      <div class="nav-item" onclick="setView('yillik',this)"><span class="nav-icon">🌟</span>Yillik</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Kategoriya</div>
+      <div class="nav-item" onclick="filterCat('Ish',this)"><span class="nav-icon">💼</span>Ish</div>
+      <div class="nav-item" onclick="filterCat('Shaxsiy',this)"><span class="nav-icon">✨</span>Shaxsiy</div>
+      <div class="nav-item" onclick="filterCat('Sog\'lik',this)"><span class="nav-icon">🏃</span>Sog'lik</div>
+      <div class="nav-item" onclick="filterCat('Oila',this)"><span class="nav-icon">🏠</span>Oila</div>
+      <div class="nav-item" onclick="filterCat('Boshqa',this)"><span class="nav-icon">🔖</span>Boshqa</div>
+    </div>
+
+    <div class="score-widget">
+      <div class="sw-label">Bugungi baholash</div>
+      <div class="sw-stars" id="swStars">
+        <span class="sw-star">★</span><span class="sw-star">★</span>
+        <span class="sw-star">★</span><span class="sw-star">★</span><span class="sw-star">★</span>
+      </div>
+      <div class="sw-note" id="swNote">Hali baholanmagan</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="top-bar">
+      <div class="top-left">
+        <div class="view-title" id="viewTitle">Kunlik reja</div>
+        <div class="view-sub" id="viewSub"></div>
+      </div>
+      <button class="add-btn" onclick="openTaskModal()">+ Vazifa qo'shish</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-top"><span class="stat-ico">📋</span><span class="stat-badge up">JAMI</span></div>
+        <div class="stat-num" id="stTotal">0</div>
+        <div class="stat-lbl">Vazifalar</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stTotalBar" style="width:100%;background:var(--a1)"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span class="stat-ico">✅</span><span class="stat-badge up">BAJARILDI</span></div>
+        <div class="stat-num" id="stDone">0</div>
+        <div class="stat-lbl">Bajarilgan</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stDoneBar" style="width:0%;background:var(--a3)"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span class="stat-ico">⏳</span><span class="stat-badge down">QOLDI</span></div>
+        <div class="stat-num" id="stPending">0</div>
+        <div class="stat-lbl">Kutilmoqda</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stPendingBar" style="width:0%;background:var(--a2)"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><span class="stat-ico">📊</span><span class="stat-badge up">FOIZ</span></div>
+        <div class="stat-num" id="stPct">0%</div>
+        <div class="stat-lbl">Samaradorlik</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stPctBar" style="width:0%;background:var(--a5)"></div></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-grid">
+      <!-- TASKS PANEL -->
+      <div class="panel">
+        <div class="panel-hd">
+          <div class="panel-title">Vazifalar ro'yxati</div>
+          <div class="flt-wrap">
+            <button class="flt active" onclick="setStatusFilter('all',this)">Barchasi</button>
+            <button class="flt" onclick="setStatusFilter('pending',this)">Kutilmoqda</button>
+            <button class="flt" onclick="setStatusFilter('done',this)">Bajarildi</button>
+          </div>
+        </div>
+        <div class="task-list" id="taskList"></div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-col">
+        <!-- PROGRESS -->
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">Kategoriya progress</div></div>
+          <div class="prog-wrap">
+            <div class="prog-item">
+              <div class="prog-row"><span class="prog-name">💼 Ish</span><span class="prog-pct" id="pIsh">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" id="bIsh" style="width:0%;background:var(--a1)"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-row"><span class="prog-name">✨ Shaxsiy</span><span class="prog-pct" id="pShaxsiy">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" id="bShaxsiy" style="width:0%;background:var(--a2)"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-row"><span class="prog-name">🏃 Sog'lik</span><span class="prog-pct" id="pSoglik">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" id="bSoglik" style="width:0%;background:var(--a3)"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-row"><span class="prog-name">🏠 Oila</span><span class="prog-pct" id="pOila">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" id="bOila" style="width:0%;background:var(--a4)"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-row"><span class="prog-name">🔖 Boshqa</span><span class="prog-pct" id="pBoshqa">0%</span></div>
+              <div class="prog-bar"><div class="prog-fill" id="bBoshqa" style="width:0%;background:var(--a5)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REMINDERS -->
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-title">Eslatmalar 🔔</div>
+            <button class="flt" onclick="openRemModal()" style="padding:5px 12px">+ Qo'shish</button>
+          </div>
+          <div class="rem-list" id="remList"></div>
+        </div>
+
+        <!-- SELF EVAL -->
+        <div class="panel">
+          <div class="panel-hd"><div class="panel-title">O'zingizni baholang</div></div>
+          <div class="eval-wrap">
+            <div class="eval-q">Bugun qanchalik samarali bo'ldingiz?</div>
+            <div class="eval-stars" id="evalStars">
+              <span class="eval-star" onclick="doRate(1)">★</span>
+              <span class="eval-star" onclick="doRate(2)">★</span>
+              <span class="eval-star" onclick="doRate(3)">★</span>
+              <span class="eval-star" onclick="doRate(4)">★</span>
+              <span class="eval-star" onclick="doRate(5)">★</span>
+            </div>
+            <div class="eval-msg" id="evalMsg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD TASK MODAL -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal-box">
+    <div class="modal-title">➕ Yangi vazifa</div>
+    <div class="form-group">
+      <label class="form-label">Vazifa nomi *</label>
+      <input class="form-input" id="tName" placeholder="Masalan: Prezentatsiya tayyorlash" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tavsif</label>
+      <textarea class="form-textarea" id="tDesc" placeholder="Qo'shimcha ma'lumot..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Kategoriya</label>
+        <select class="form-select" id="tCat">
+          <option value="Ish">💼 Ish</option>
+          <option value="Shaxsiy">✨ Shaxsiy</option>
+          <option value="Sog'lik">🏃 Sog'lik</option>
+          <option value="Oila">🏠 Oila</option>
+          <option value="Boshqa">🔖 Boshqa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ustuvorlik</label>
+        <select class="form-select" id="tPrio">
+          <option value="high">🔴 Yuqori</option>
+          <option value="mid" selected>🟡 O'rta</option>
+          <option value="low">⚪ Past</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Reja turi</label>
+        <select class="form-select" id="tView">
+          <option value="kunlik">☀️ Kunlik</option>
+          <option value="haftalik">📅 Haftalik</option>
+          <option value="oylik">🗓️ Oylik</option>
+          <option value="yillik">🌟 Yillik</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sana</label>
+        <input class="form-input" type="date" id="tDate" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeTaskModal()">Bekor</button>
+      <button class="btn-primary" onclick="addTask()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMINDER MODAL -->
+<div class="rem-modal" id="remModal">
+  <div class="modal-box">
+    <div class="modal-title">🔔 Eslatma qo'shish</div>
+    <div class="form-group">
+      <label class="form-label">Eslatma matni *</label>
+      <input class="form-input" id="rText" placeholder="Masalan: Dori ichish vaqti" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Vaqt</label>
+        <input class="form-input" type="time" id="rTime" value="09:00" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sana</label>
+        <input class="form-input" type="date" id="rDate" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeRemModal()">Bekor</button>
+      <button class="btn-primary" onclick="addReminder()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIco">✅</span>
+  <span id="toastTxt">Saqlandi!</span>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+const EMOJIS = ['👤','🧑','👩','🧒','🧔','👨‍💻','👩‍💻','🦸','🧙','🎯','🚀','🌟','⚡','🔥','🎨','🏆'];
+const COLORS = ['#4f8ef7','#4fd1a5','#f7c948','#f7654f','#b44ff7','#f74fae','#47c7f7'];
+
+let profiles = [];
+let currentProfileId = null;
+let currentView = 'kunlik';
+let statusFilter = 'all';
+let catFilter = null;
+let selEmoji = EMOJIS[0];
+let selColor = COLORS[0];
+
+// ═══════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════
+function save() { localStorage.setItem('at_profiles', JSON.stringify(profiles)); }
+function load() {
+  try { profiles = JSON.parse(localStorage.getItem('at_profiles') || '[]'); } catch { profiles = []; }
+}
+
+function getProfile(id) { return profiles.find(p => p.id === id); }
+function currentData() { return getProfile(currentProfileId); }
+
+// ═══════════════════════════════════
+// PROFILE SCREEN
+// ═══════════════════════════════════
+function renderProfileScreen() {
+  const grid = document.getElementById('profilesGrid');
+  const colorMap = {};
+  grid.innerHTML = '';
+
+  profiles.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'profile-card';
+    div.style.setProperty('--card-color', p.color);
+    const tasks = p.tasks || [];
+    const done = tasks.filter(t => t.done).length;
+    div.innerHTML = `
+      <button class="profile-del" onclick="deleteProfile(event,'${p.id}')">✕</button>
+      <div class="profile-avatar" style="border-color:${p.color}">${p.emoji}</div>
+      <div class="profile-name">${p.name}</div>
+      <div class="profile-tasks">${tasks.length} vazifa · ${done} bajarildi</div>
+    `;
+    div.addEventListener('click', () => selectProfile(p.id));
+    grid.appendChild(div);
+  });
+
+  // Add new card
+  const add = document.createElement('div');
+  add.className = 'add-profile-card';
+  add.innerHTML = `<div class="add-profile-icon">＋</div><div class="add-profile-text">Yangi profil</div>`;
+  add.onclick = openNpModal;
+  grid.appendChild(add);
+}
+
+function selectProfile(id) {
+  currentProfileId = id;
+  showScreen('appScreen');
+  updateProfileUI();
+  renderAll();
+}
+
+function goToProfiles() {
+  currentProfileId = null;
+  showScreen('profileScreen');
+  renderProfileScreen();
+}
+
+function deleteProfile(e, id) {
+  e.stopPropagation();
+  if (!confirm('Profilni o\'chirmoqchimisiz?')) return;
+  profiles = profiles.filter(p => p.id !== id);
+  save();
+  renderProfileScreen();
+}
+
+// ═══════════════════════════════════
+// NEW PROFILE MODAL
+// ═══════════════════════════════════
+function openNpModal() {
+  // render emoji picker
+  const ep = document.getElementById('emojiPicker');
+  ep.innerHTML = EMOJIS.map((e,i) => `<div class="emoji-opt${i===0?' sel':''}" onclick="pickEmoji(this,'${e}')">${e}</div>`).join('');
+  selEmoji = EMOJIS[0];
+
+  // render color picker
+  const cp = document.getElementById('colorPicker');
+  cp.innerHTML = COLORS.map((c,i) => `<div class="color-opt${i===0?' sel':''}" style="background:${c}" onclick="pickColor(this,'${c}')"></div>`).join('');
+  selColor = COLORS[0];
+
+  document.getElementById('npName').value = '';
+  document.getElementById('npModal').classList.add('open');
+  setTimeout(() => document.getElementById('npName').focus(), 200);
+}
+
+function closeNpModal() { document.getElementById('npModal').classList.remove('open'); }
+
+function pickEmoji(el, em) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel'); selEmoji = em;
+}
+function pickColor(el, c) {
+  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel'); selColor = c;
+}
+
+function createProfile() {
+  const name = document.getElementById('npName').value.trim();
+  if (!name) { showToast('⚠️','Ism kiriting!'); return; }
+  const prof = {
+    id: 'p_' + Date.now(),
+    name, emoji: selEmoji, color: selColor,
+    tasks: [], reminders: [], rating: 0,
+    createdAt: new Date().toISOString()
+  };
+  profiles.push(prof);
+  save();
+  closeNpModal();
+  renderProfileScreen();
+  showToast('🎉', name + ' profili yaratildi!');
+}
+
+// ═══════════════════════════════════
+// APP UI
+// ═══════════════════════════════════
+function updateProfileUI() {
+  const p = currentData();
+  if (!p) return;
+  document.getElementById('cpAvatar').textContent = p.emoji;
+  document.getElementById('cpAvatar').style.borderColor = p.color;
+  document.getElementById('cpName').textContent = p.name;
+  document.documentElement.style.setProperty('--profile-color', p.color);
+  // restore rating
+  setRatingUI(p.rating || 0);
+}
+
+function setView(v, el) {
+  currentView = v;
+  catFilter = null;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  const titles = {kunlik:'Kunlik reja',haftalik:'Haftalik reja',oylik:'Oylik reja',yillik:'Yillik reja'};
+  document.getElementById('viewTitle').textContent = titles[v];
+  document.getElementById('tView').value = v;
+  renderAll();
+}
+
+function filterCat(cat, el) {
+  catFilter = catFilter === cat ? null : cat;
+  document.querySelectorAll('.nav-section:nth-child(3) .nav-item').forEach(n => n.classList.remove('active'));
+  if (catFilter) el.classList.add('active');
+  renderTasks();
+}
+
+function setStatusFilter(s, el) {
+  statusFilter = s;
+  document.querySelectorAll('.flt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTasks();
+}
+
+// ═══════════════════════════════════
+// TASKS
+// ═══════════════════════════════════
+function openTaskModal() {
+  document.getElementById('tDate').value = todayStr();
+  document.getElementById('tName').value = '';
+  document.getElementById('tDesc').value = '';
+  document.getElementById('taskModal').classList.add('open');
+  setTimeout(() => document.getElementById('tName').focus(), 150);
+}
+function closeTaskModal() { document.getElementById('taskModal').classList.remove('open'); }
+
+function addTask() {
+  const name = document.getElementById('tName').value.trim();
+  if (!name) { showToast('⚠️','Vazifa nomini kiriting!'); return; }
+  const p = currentData();
+  p.tasks.push({
+    id: 't_' + Date.now(),
+    name,
+    desc: document.getElementById('tDesc').value.trim(),
+    cat: document.getElementById('tCat').value,
+    priority: document.getElementById('tPrio').value,
+    view: document.getElementById('tView').value,
+    date: document.getElementById('tDate').value,
+    done: false,
+    createdAt: new Date().toISOString()
+  });
+  save();
+  closeTaskModal();
+  renderAll();
+  showToast('✅','Vazifa qo\'shildi!');
+}
+
+function toggleTask(id) {
+  const p = currentData();
+  const t = p.tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; save(); renderAll(); }
+}
+
+function deleteTask(id) {
+  const p = currentData();
+  p.tasks = p.tasks.filter(t => t.id !== id);
+  save(); renderAll();
+  showToast('🗑️','Vazifa o\'chirildi!');
+}
+
+function renderTasks() {
+  const p = currentData();
+  const list = document.getElementById('taskList');
+  if (!p) { list.innerHTML = ''; return; }
+
+  let tasks = p.tasks.filter(t => t.view === currentView);
+  if (catFilter) tasks = tasks.filter(t => t.cat === catFilter);
+  if (statusFilter === 'done') tasks = tasks.filter(t => t.done);
+  if (statusFilter === 'pending') tasks = tasks.filter(t => !t.done);
+
+  if (!tasks.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Hali vazifalar yo'q.<br>Yangi vazifa qo'shing!</div></div>`;
+    return;
+  }
+
+  const catClass = {
+    'Ish':'tag-ish','Shaxsiy':'tag-shaxsiy',"Sog'lik":'tag-soglik','Oila':'tag-oila','Boshqa':'tag-boshqa'
+  };
+  const catIco = {'Ish':'💼','Shaxsiy':'✨',"Sog'lik":'🏃','Oila':'🏠','Boshqa':'🔖'};
+
+  // Sort: undone first, then by priority
+  const pOrder = {high:0,mid:1,low:2};
+  tasks.sort((a,b) => a.done - b.done || pOrder[a.priority] - pOrder[b.priority]);
+
+  list.innerHTML = tasks.map(t => `
+    <div class="task-item">
+      <div class="prio-dot prio-${t.priority}"></div>
+      <div class="task-cb ${t.done?'done':''}" onclick="toggleTask('${t.id}')"></div>
+      <div class="task-body">
+        <div class="task-text ${t.done?'done':''}">${escHtml(t.name)}</div>
+        ${t.desc ? `<div class="task-desc">${escHtml(t.desc)}</div>` : ''}
+        <div class="task-meta">
+          <span class="tag ${catClass[t.cat]||'tag-boshqa'}">${catIco[t.cat]||'🔖'} ${t.cat}</span>
+          ${t.date ? `<span class="task-date">📅 ${t.date}</span>` : ''}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="act-btn" onclick="deleteTask('${t.id}')" title="O'chirish">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════
+// STATS & PROGRESS
+// ═══════════════════════════════════
+function renderStats() {
+  const p = currentData(); if (!p) return;
+  const tasks = p.tasks.filter(t => t.view === currentView);
+  const total = tasks.length;
+  const done = tasks.filter(t => t.done).length;
+  const pending = total - done;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  document.getElementById('stTotal').textContent = total;
+  document.getElementById('stDone').textContent = done;
+  document.getElementById('stPending').textContent = pending;
+  document.getElementById('stPct').textContent = pct + '%';
+  document.getElementById('stDoneBar').style.width = pct + '%';
+  document.getElementById('stPendingBar').style.width = total ? (pending/total*100)+'%' : '0%';
+  document.getElementById('stPctBar').style.width = pct + '%';
+}
+
+function renderProgress() {
+  const p = currentData(); if (!p) return;
+  const cats = ['Ish','Shaxsiy',"Sog'lik",'Oila','Boshqa'];
+  const ids = ['Ish','Shaxsiy','Soglik','Oila','Boshqa'];
+  cats.forEach((c, i) => {
+    const all = p.tasks.filter(t => t.cat === c);
+    const done = all.filter(t => t.done).length;
+    const pct = all.length ? Math.round(done/all.length*100) : 0;
+    document.getElementById('p'+ids[i]).textContent = pct+'%';
+    document.getElementById('b'+ids[i]).style.width = pct+'%';
+  });
+}
+
+// ═══════════════════════════════════
+// REMINDERS
+// ═══════════════════════════════════
+function openRemModal() {
+  document.getElementById('rDate').value = todayStr();
+  document.getElementById('rText').value = '';
+  document.getElementById('remModal').classList.add('open');
+  setTimeout(() => document.getElementById('rText').focus(), 150);
+}
+function closeRemModal() { document.getElementById('remModal').classList.remove('open'); }
+
+function addReminder() {
+  const text = document.getElementById('rText').value.trim();
+  if (!text) { showToast('⚠️','Eslatma matnini kiriting!'); return; }
+  const p = currentData();
+  p.reminders.push({
+    id: 'r_' + Date.now(),
+    text,
+    time: document.getElementById('rTime').value,
+    date: document.getElementById('rDate').value
+  });
+  save();
+  closeRemModal();
+  renderReminders();
+  showToast('🔔','Eslatma qo\'shildi!');
+}
+
+function deleteReminder(id) {
+  const p = currentData();
+  p.reminders = p.reminders.filter(r => r.id !== id);
+  save(); renderReminders();
+}
+
+function renderReminders() {
+  const p = currentData();
+  const list = document.getElementById('remList');
+  if (!p || !p.reminders.length) {
+    list.innerHTML = '<div style="padding:14px 0;color:var(--muted);font-size:13px;text-align:center">Hali eslatmalar yo\'q</div>';
+    return;
+  }
+  const sorted = [...p.reminders].sort((a,b) => a.time.localeCompare(b.time));
+  list.innerHTML = sorted.map(r => `
+    <div class="rem-item">
+      <div class="rem-ico">🔔</div>
+      <div class="rem-body">
+        <div class="rem-text">${escHtml(r.text)}</div>
+        <div class="rem-time">${r.time} · ${r.date}</div>
+      </div>
+      <button class="rem-del" onclick="deleteReminder('${r.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════
+// SELF EVAL
+// ═══════════════════════════════════
+const evalMsgs = ['','😔 Qiyin kun o\'tdi','😐 O\'rtacha edi','🙂 Yaxshi kun!','😊 Juda yaxshi!','🌟 Ajoyib kun!'];
+
+function doRate(v) {
+  const p = currentData(); if (!p) return;
+  p.rating = v; save();
+  setRatingUI(v);
+  showToast('⭐','Baholash saqlandi!');
+}
+
+function setRatingUI(v) {
+  document.querySelectorAll('.eval-star').forEach((s,i) => s.classList.toggle('lit', i < v));
+  document.getElementById('evalMsg').textContent = evalMsgs[v] || '';
+  // sidebar stars
+  document.querySelectorAll('.sw-star').forEach((s,i) => s.classList.toggle('lit', i < v));
+  document.getElementById('swNote').textContent = v ? evalMsgs[v] : 'Hali baholanmagan';
+}
+
+// ═══════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════
+function renderAll() { renderTasks(); renderStats(); renderProgress(); renderReminders(); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToast(ico, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIco').textContent = ico;
+  document.getElementById('toastTxt').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// close modals on overlay click
+document.querySelectorAll('.modal-overlay,.np-modal,.rem-modal').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay,.np-modal,.rem-modal').forEach(m => m.classList.remove('open'));
+  if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); if (currentProfileId) openTaskModal(); }
+});
+
+// date subtitle
+const d = new Date();
+const uzMonths = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+const uzDays = ['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+document.getElementById('viewSub').textContent = `${uzDays[d.getDay()]}, ${d.getDate()} ${uzMonths[d.getMonth()]} ${d.getFullYear()}`;
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+load();
+renderProfileScreen();
+</script>
+</body>
+</html>

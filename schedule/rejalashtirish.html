@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rejachilik — Mening Rejalarim</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1928;
+    --surface2: #242336;
+    --border: #2e2d45;
+    --accent: #e8c547;
+    --accent2: #ff6b6b;
+    --accent3: #6bcbff;
+    --text: #f0eff8;
+    --muted: #8887a5;
+    --green: #5dda8a;
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG effect */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(232,197,71,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+
+  .nav-section { margin-bottom: 28px; }
+  .nav-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; padding-left: 4px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(232,197,71,0.12); color: var(--accent); }
+  .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+
+  .score-card {
+    margin-top: auto;
+    background: linear-gradient(135deg, rgba(93,218,138,0.1), rgba(107,203,255,0.05));
+    border: 1px solid rgba(93,218,138,0.2);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .score-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .score-value { font-family: 'Playfair Display', serif; font-size: 42px; color: var(--green); font-weight: 700; line-height: 1; }
+  .score-desc { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 32px; overflow-y: auto; }
+
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+  .header-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; }
+  .header-date { font-size: 13px; color: var(--muted); }
+
+  .add-btn {
+    background: var(--accent);
+    color: #0f0e17;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .add-btn:hover { background: #f5d45e; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,197,71,0.25); }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .stat-card:nth-child(1)::after { background: var(--accent); }
+  .stat-card:nth-child(2)::after { background: var(--accent3); }
+  .stat-card:nth-child(3)::after { background: var(--green); }
+  .stat-card:nth-child(4)::after { background: var(--accent2); }
+  .stat-icon { font-size: 22px; margin-bottom: 12px; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* CONTENT */
+  .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+
+  /* TASK LIST */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+
+  /* FILTERS */
+  .filters { display: flex; gap: 8px; }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #0f0e17; font-weight: 600; }
+  .filter-btn:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+
+  /* TASKS */
+  .tasks { padding: 16px 24px; }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(46,45,69,0.5);
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .task-item:last-child { border-bottom: none; }
+
+  .task-check {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+    background: transparent;
+  }
+  .task-check:hover { border-color: var(--accent); }
+  .task-check.done { background: var(--green); border-color: var(--green); }
+  .task-check.done::after { content: '✓'; font-size: 13px; color: #0f0e17; font-weight: 700; }
+
+  .task-body { flex: 1; }
+  .task-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.5;
+    transition: all 0.2s;
+  }
+  .task-text.done { text-decoration: line-through; color: var(--muted); }
+  .task-meta { display: flex; gap: 8px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
+
+  .tag {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .tag-ish { background: rgba(107,203,255,0.12); color: var(--accent3); }
+  .tag-shaxsiy { background: rgba(232,197,71,0.12); color: var(--accent); }
+  .tag-soglik { background: rgba(93,218,138,0.12); color: var(--green); }
+  .tag-oila { background: rgba(255,107,107,0.12); color: var(--accent2); }
+  .tag-boshqa { background: rgba(136,135,165,0.12); color: var(--muted); }
+
+  .priority {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .p-high { background: var(--accent2); box-shadow: 0 0 6px rgba(255,107,107,0.5); }
+  .p-mid { background: var(--accent); box-shadow: 0 0 6px rgba(232,197,71,0.5); }
+  .p-low { background: var(--muted); }
+
+  .task-del {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    opacity: 0;
+    transition: all 0.2s;
+    border-radius: 6px;
+    margin-top: -2px;
+  }
+  .task-item:hover .task-del { opacity: 1; }
+  .task-del:hover { background: rgba(255,107,107,0.15); color: var(--accent2); }
+
+  /* SELF EVAL */
+  .eval-stars { display: flex; gap: 4px; }
+  .star {
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    color: var(--border);
+  }
+  .star:hover, .star.active { color: var(--accent); transform: scale(1.2); }
+
+  /* RIGHT PANEL */
+  .right-col { display: flex; flex-direction: column; gap: 20px; }
+
+  /* PROGRESS */
+  .progress-wrap { padding: 20px 24px; }
+  .progress-item { margin-bottom: 18px; }
+  .progress-item:last-child { margin-bottom: 0; }
+  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-name { font-size: 13px; font-weight: 500; }
+  .progress-pct { font-size: 13px; color: var(--muted); }
+  .progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+  /* REMINDER */
+  .reminder-list { padding: 16px 24px; }
+  .reminder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--surface2);
+    margin-bottom: 10px;
+    border-left: 3px solid var(--accent3);
+  }
+  .reminder-item:nth-child(2) { border-left-color: var(--accent2); }
+  .reminder-item:nth-child(3) { border-left-color: var(--green); }
+  .reminder-time { font-size: 11px; color: var(--muted); min-width: 40px; }
+  .reminder-text { font-size: 13px; font-weight: 500; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,14,23,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 480px;
+    max-width: 95vw;
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.3s;
+  }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: block; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-select option { background: var(--surface2); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+  .btn-cancel {
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+  .btn-save {
+    padding: 11px 28px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #0f0e17;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-save:hover { background: #f5d45e; }
+
+  /* EVAL MODAL */
+  .eval-modal-body { text-align: center; padding: 10px 0; }
+  .eval-question { font-size: 15px; color: var(--muted); margin-bottom: 20px; }
+  .eval-stars-big { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+  .star-big { font-size: 36px; cursor: pointer; transition: all 0.2s; color: var(--border); }
+  .star-big:hover, .star-big.sel { color: var(--accent); transform: scale(1.15); }
+  .eval-comment { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; resize: none; min-height: 80px; }
+  .eval-comment:focus { border-color: var(--accent); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--text);
+    z-index: 200;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 20px; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .content-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .sidebar { width: 220px; }
+  }
+  @media (max-width: 600px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; padding: 16px; }
+    .logo-sub, .score-card { display: none; }
+    .nav-section { margin-bottom: 0; }
+    .main { padding: 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">Rejachilik</div>
+    <div class="logo-sub">Mening rejalarim</div>
+
+    <div class="nav-section">
+      <div class="nav-label">Ko'rinish</div>
+      <div class="nav-item active" onclick="setView('kunlik', this)">
+        <span class="icon">☀️</span> Kunlik
+      </div>
+      <div class="nav-item" onclick="setView('haftalik', this)">
+        <span class="icon">📅</span> Haftalik
+      </div>
+      <div class="nav-item" onclick="setView('oylik', this)">
+        <span class="icon">🗓️</span> Oylik
+      </div>
+      <div class="nav-item" onclick="setView('yillik', this)">
+        <span class="icon">🌟</span> Yillik
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Kategoriya</div>
+      <div class="nav-item" onclick="filterCat('Ish', this)">
+        <span class="icon">💼</span> Ish
+      </div>
+      <div class="nav-item" onclick="filterCat('Shaxsiy', this)">
+        <span class="icon">✨</span> Shaxsiy
+      </div>
+      <div class="nav-item" onclick="filterCat('Sog\'lik', this)">
+        <span class="icon">🏃</span> Sog'lik
+      </div>
+      <div class="nav-item" onclick="filterCat('Oila', this)">
+        <span class="icon">🏠</span> Oila
+      </div>
+    </div>
+
+    <div class="score-card">
+      <div class="score-label">Bugungi ball</div>
+      <div class="score-value" id="sidebarScore">—</div>
+      <div class="score-desc">O'z-o'zini baholash</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="header-title" id="viewTitle">Kunlik reja</div>
+        <div class="header-date" id="viewDate"></div>
+      </div>
+      <button class="add-btn" onclick="openModal()">+ Yangi vazifa</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-num" id="totalCount">0</div>
+        <div class="stat-label">Jami vazifalar</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-num" id="doneCount">0</div>
+        <div class="stat-label">Bajarilgan</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-num" id="pendingCount">0</div>
+        <div class="stat-label">Kutilmoqda</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-num" id="percentCount">0%</div>
+        <div class="stat-label">Samaradorlik</div>
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="content-grid">
+      <!-- TASKS PANEL -->
+      <div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Vazifalar</div>
+            <div class="filters">
+              <button class="filter-btn active" onclick="filterStatus('all', this)">Barchasi</button>
+              <button class="filter-btn" onclick="filterStatus('pending', this)">Kutilmoqda</button>
+              <button class="filter-btn" onclick="filterStatus('done', this)">Bajarilgan</button>
+            </div>
+          </div>
+          <div class="tasks" id="taskList">
+            <div class="empty-state">
+              <div class="empty-icon">📝</div>
+              <div class="empty-text">Hali vazifalar yo'q.<br>Yangi vazifa qo'shing!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COL -->
+      <div class="right-col">
+        <!-- PROGRESS -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Progress</div>
+          </div>
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-item">
+              <div class="progress-row">
+                <span class="progress-name">💼 Ish</span>
+                <span class="progress-pct" id="pct-Ish">0%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="bar-Ish" style="width:0%;background:var(--accent3)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-row">
+                <span class="progress-name">✨ Shaxsiy</span>
+                <span class="progress-pct" id="pct-Shaxsiy">0%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="bar-Shaxsiy" style="width:0%;background:var(--accent)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-row">
+                <span class="progress-name">🏃 Sog'lik</span>
+                <span class="progress-pct" id="pct-Soglik">0%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="bar-Soglik" style="width:0%;background:var(--green)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-row">
+                <span class="progress-name">🏠 Oila</span>
+                <span class="progress-pct" id="pct-Oila">0%</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="bar-Oila" style="width:0%;background:var(--accent2)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REMINDERS -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Eslatmalar</div>
+            <button class="filter-btn" onclick="openReminderModal()" style="padding:6px 12px">+ Qo'shish</button>
+          </div>
+          <div class="reminder-list" id="reminderList">
+            <div style="padding:12px 0;color:var(--muted);font-size:13px;text-align:center">Hali eslatmalar yo'q</div>
+          </div>
+        </div>
+
+        <!-- SELF EVAL -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">O'zingizni baholang</div>
+          </div>
+          <div style="padding:20px 24px">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:14px">Bugun qanchalik samarali bo'ldingiz?</div>
+            <div class="eval-stars" id="evalStars">
+              <span class="star" onclick="rate(1)" data-v="1">★</span>
+              <span class="star" onclick="rate(2)" data-v="2">★</span>
+              <span class="star" onclick="rate(3)" data-v="3">★</span>
+              <span class="star" onclick="rate(4)" data-v="4">★</span>
+              <span class="star" onclick="rate(5)" data-v="5">★</span>
+            </div>
+            <div id="evalMsg" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD TASK MODAL -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-title">✨ Yangi vazifa</div>
+    <div class="form-group">
+      <label class="form-label">Vazifa nomi</label>
+      <input class="form-input" id="taskName" placeholder="Masalan: Hisobot tayyorlash" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tavsif</label>
+      <textarea class="form-textarea" id="taskDesc" placeholder="Qo'shimcha ma'lumot..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Kategoriya</label>
+        <select class="form-select" id="taskCat">
+          <option value="Ish">💼 Ish</option>
+          <option value="Shaxsiy">✨ Shaxsiy</option>
+          <option value="Sog'lik">🏃 Sog'lik</option>
+          <option value="Oila">🏠 Oila</option>
+          <option value="Boshqa">🔖 Boshqa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ustuvorlik</label>
+        <select class="form-select" id="taskPriority">
+          <option value="high">🔴 Yuqori</option>
+          <option value="mid" selected>🟡 O'rta</option>
+          <option value="low">⚪ Past</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ko'rinish</label>
+        <select class="form-select" id="taskView">
+          <option value="kunlik">☀️ Kunlik</option>
+          <option value="haftalik">📅 Haftalik</option>
+          <option value="oylik">🗓️ Oylik</option>
+          <option value="yillik">🌟 Yillik</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sana</label>
+        <input class="form-input" type="date" id="taskDate" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
+      <button class="btn-save" onclick="addTask()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMINDER MODAL -->
+<div class="modal-overlay" id="reminderModal">
+  <div class="modal">
+    <div class="modal-title">🔔 Eslatma qo'shish</div>
+    <div class="form-group">
+      <label class="form-label">Eslatma matni</label>
+      <input class="form-input" id="remText" placeholder="Masalan: Dori ichish" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Vaqt</label>
+        <input class="form-input" type="time" id="remTime" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sana</label>
+        <input class="form-input" type="date" id="remDate" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeReminderModal()">Bekor qilish</button>
+      <button class="btn-save" onclick="addReminder()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span id="toastMsg">Saqlandi!</span>
+</div>
+
+<script>
+let tasks = [];
+let reminders = [];
+let currentView = 'kunlik';
+let currentStatusFilter = 'all';
+let currentCatFilter = null;
+let todayRating = 0;
+
+const evalMessages = ['', '😔 Qiyin kun bo\'ldi', '😐 O\'rtacha o\'tdi', '🙂 Yaxshi edi!', '😊 Juda yaxshi!', '🌟 Zo\'r kun!'];
+
+// Init date
+const today = new Date();
+document.getElementById('taskDate').valueAsDate = today;
+document.getElementById('remDate').valueAsDate = today;
+document.getElementById('remTime').value = '09:00';
+
+function setDate() {
+  const d = today;
+  const months = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+  const days = ['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+  document.getElementById('viewDate').textContent = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+setDate();
+
+function setView(v, el) {
+  currentView = v;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  const titles = { kunlik: 'Kunlik reja', haftalik: 'Haftalik reja', oylik: 'Oylik reja', yillik: 'Yillik reja' };
+  document.getElementById('viewTitle').textContent = titles[v];
+  document.getElementById('taskView').value = v;
+  renderTasks();
+}
+
+function filterCat(cat, el) {
+  if (currentCatFilter === cat) {
+    currentCatFilter = null;
+    document.querySelectorAll('.nav-section:nth-child(2) .nav-item').forEach(i => i.classList.remove('active'));
+  } else {
+    currentCatFilter = cat;
+    document.querySelectorAll('.nav-section:nth-child(2) .nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+  renderTasks();
+}
+
+function filterStatus(s, el) {
+  currentStatusFilter = s;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTasks();
+}
+
+function openModal() {
+  document.getElementById('taskModal').classList.add('open');
+  document.getElementById('taskName').focus();
+}
+function closeModal() {
+  document.getElementById('taskModal').classList.remove('open');
+  document.getElementById('taskName').value = '';
+  document.getElementById('taskDesc').value = '';
+}
+
+function openReminderModal() {
+  document.getElementById('reminderModal').classList.add('open');
+  document.getElementById('remText').focus();
+}
+function closeReminderModal() {
+  document.getElementById('reminderModal').classList.remove('open');
+  document.getElementById('remText').value = '';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e) {
+    if (e.target === this) { this.classList.remove('open'); }
+  });
+});
+
+function addTask() {
+  const name = document.getElementById('taskName').value.trim();
+  if (!name) { showToast('⚠️', 'Vazifa nomini kiriting!'); return; }
+
+  tasks.push({
+    id: Date.now(),
+    name,
+    desc: document.getElementById('taskDesc').value.trim(),
+    cat: document.getElementById('taskCat').value,
+    priority: document.getElementById('taskPriority').value,
+    view: document.getElementById('taskView').value,
+    date: document.getElementById('taskDate').value,
+    done: false
+  });
+
+  closeModal();
+  renderTasks();
+  updateStats();
+  showToast('✅', 'Vazifa qo\'shildi!');
+}
+
+function addReminder() {
+  const text = document.getElementById('remText').value.trim();
+  if (!text) { showToast('⚠️', 'Eslatma matnini kiriting!'); return; }
+  reminders.push({
+    id: Date.now(),
+    text,
+    time: document.getElementById('remTime').value,
+    date: document.getElementById('remDate').value
+  });
+  closeReminderModal();
+  renderReminders();
+  showToast('🔔', 'Eslatma qo\'shildi!');
+}
+
+function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; renderTasks(); updateStats(); updateProgress(); }
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  renderTasks();
+  updateStats();
+  updateProgress();
+  showToast('🗑️', 'Vazifa o\'chirildi!');
+}
+
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  let filtered = tasks.filter(t => t.view === currentView);
+  if (currentCatFilter) filtered = filtered.filter(t => t.cat === currentCatFilter || t.cat === currentCatFilter + "'lik");
+  if (currentStatusFilter === 'done') filtered = filtered.filter(t => t.done);
+  if (currentStatusFilter === 'pending') filtered = filtered.filter(t => !t.done);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-text">Hali vazifalar yo'q.<br>Yangi vazifa qo'shing!</div></div>`;
+    return;
+  }
+
+  const catMap = { 'Ish': 'tag-ish', 'Shaxsiy': 'tag-shaxsiy', "Sog'lik": 'tag-soglik', 'Oila': 'tag-oila', 'Boshqa': 'tag-boshqa' };
+  const catEmoji = { 'Ish': '💼', 'Shaxsiy': '✨', "Sog'lik": '🏃', 'Oila': '🏠', 'Boshqa': '🔖' };
+
+  list.innerHTML = filtered.map(t => `
+    <div class="task-item" id="task-${t.id}">
+      <div class="priority p-${t.priority}"></div>
+      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})"></div>
+      <div class="task-body">
+        <div class="task-text ${t.done ? 'done' : ''}">${t.name}</div>
+        ${t.desc ? `<div style="font-size:12px;color:var(--muted);margin-top:4px">${t.desc}</div>` : ''}
+        <div class="task-meta">
+          <span class="tag ${catMap[t.cat] || 'tag-boshqa'}">${catEmoji[t.cat] || '🔖'} ${t.cat}</span>
+          ${t.date ? `<span style="font-size:11px;color:var(--muted)">${t.date}</span>` : ''}
+        </div>
+      </div>
+      <button class="task-del" onclick="deleteTask(${t.id})">✕</button>
+    </div>
+  `).join('');
+
+  updateStats();
+  updateProgress();
+}
+
+function updateStats() {
+  const viewTasks = tasks.filter(t => t.view === currentView);
+  const total = viewTasks.length;
+  const done = viewTasks.filter(t => t.done).length;
+  const pending = total - done;
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('pendingCount').textContent = pending;
+  document.getElementById('percentCount').textContent = pct + '%';
+}
+
+function updateProgress() {
+  const cats = ['Ish', 'Shaxsiy', "Sog'lik", 'Oila'];
+  const ids = ['Ish', 'Shaxsiy', 'Soglik', 'Oila'];
+  cats.forEach((c, i) => {
+    const all = tasks.filter(t => t.cat === c);
+    const done = all.filter(t => t.done).length;
+    const pct = all.length ? Math.round(done / all.length * 100) : 0;
+    document.getElementById('pct-' + ids[i]).textContent = pct + '%';
+    document.getElementById('bar-' + ids[i]).style.width = pct + '%';
+  });
+}
+
+function renderReminders() {
+  const list = document.getElementById('reminderList');
+  if (!reminders.length) {
+    list.innerHTML = '<div style="padding:12px 0;color:var(--muted);font-size:13px;text-align:center">Hali eslatmalar yo\'q</div>';
+    return;
+  }
+  const sorted = [...reminders].sort((a,b) => a.time.localeCompare(b.time));
+  list.innerHTML = sorted.map(r => `
+    <div class="reminder-item">
+      <div style="font-size:18px">🔔</div>
+      <div style="flex:1">
+        <div class="reminder-text">${r.text}</div>
+        <div class="reminder-time">${r.time} · ${r.date}</div>
+      </div>
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px" onclick="deleteReminder(${r.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function deleteReminder(id) {
+  reminders = reminders.filter(r => r.id !== id);
+  renderReminders();
+}
+
+function rate(v) {
+  todayRating = v;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < v);
+  });
+  document.getElementById('evalMsg').textContent = evalMessages[v];
+  document.getElementById('sidebarScore').textContent = v + '/5';
+  showToast('⭐', 'Baholash saqlandi!');
+}
+
+function showToast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); openModal(); }
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// Demo data
+tasks = [
+  { id: 1, name: 'Ishga borish va hisobot tayyorlash', desc: 'Q1 hisobotini tugatish', cat: 'Ish', priority: 'high', view: 'kunlik', date: today.toISOString().split('T')[0], done: false },
+  { id: 2, name: 'Ertalabki yugurish (30 daqiqa)', desc: '', cat: "Sog'lik", priority: 'mid', view: 'kunlik', date: today.toISOString().split('T')[0], done: true },
+  { id: 3, name: 'Kitob o\'qish - 20 bet', desc: 'Atomic Habits', cat: 'Shaxsiy', priority: 'low', view: 'kunlik', date: today.toISOString().split('T')[0], done: false },
+  { id: 4, name: 'Oylik byudjetni ko\'rib chiqish', desc: '', cat: 'Shaxsiy', priority: 'high', view: 'oylik', date: today.toISOString().split('T')[0], done: false },
+  { id: 5, name: 'Yangi loyiha rejasini tuzish', desc: '', cat: 'Ish', priority: 'mid', view: 'haftalik', date: today.toISOString().split('T')[0], done: false },
+];
+reminders = [
+  { id: 1, text: 'Dori ichish', time: '08:00', date: today.toISOString().split('T')[0] },
+  { id: 2, text: 'Yig\'ilishga tayyorgarlik', time: '14:00', date: today.toISOString().split('T')[0] },
+];
+
+renderTasks();
+renderReminders();
+updateStats();
+updateProgress();
+</script>
+</body>
+</html>
