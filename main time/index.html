@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vazifa Rejalashtirish Tizimi</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Login/Register Container -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-form">
+            <div class="auth-header">
+                <h1><i class="fas fa-calendar-check"></i> Vazifa Rejalashtirish Tizimi</h1>
+                <p>Tizimga kirish yoki ro'yxatdan o'tish</p>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="form-container" id="loginForm">
+                <h2>Tizimga kirish</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Parol:</label>
+                        <input type="password" id="loginPassword" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Kirish</button>
+                </form>
+                <p class="auth-switch">
+                    Hisobingiz yo'qmi? <a href="#" id="showRegister">Ro'yxatdan o'tish</a>
+                </p>
+            </div>
+            
+            <!-- Register Form -->
+            <div class="form-container hidden" id="registerForm">
+                <h2>Ro'yxatdan o'tish</h2>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerName">Ism familiya:</label>
+                        <input type="text" id="registerName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Parol:</label>
+                        <input type="password" id="registerPassword" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Parolni tasdiqlash:</label>
+                        <input type="password" id="registerConfirmPassword" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Ro'yxatdan o'tish</button>
+                </form>
+                <p class="auth-switch">
+                    Hisobingiz bormi? <a href="#" id="showLogin">Kirish</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="container hidden" id="mainApp">
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-calendar-check"></i> Vazifa Rejalashtirish Tizimi</h1>
+                <div class="current-date" id="currentDate"></div>
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Foydalanuvchi</div>
+                        <div class="user-email" id="userEmail">user@example.com</div>
+                    </div>
+                    <div class="user-menu">
+                        <button class="btn btn-secondary" id="profileBtn">
+                            <i class="fas fa-cog"></i> Profil
+                        </button>
+                        <button class="btn btn-danger" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Chiqish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="daily"><i class="fas fa-calendar-day"></i> Kunlik</button>
+            <button class="nav-tab" data-tab="weekly"><i class="fas fa-calendar-week"></i> Haftalik</button>
+            <button class="nav-tab" data-tab="monthly"><i class="fas fa-calendar-alt"></i> Oylik</button>
+            <button class="nav-tab" data-tab="yearly"><i class="fas fa-calendar"></i> Yillik</button>
+        </nav>
+
+        <main>
+            <div class="control-panel">
+                <button class="btn btn-primary" id="addTaskBtn">
+                    <i class="fas fa-plus"></i> Yangi vazifa
+                </button>
+                <select id="categoryFilter" class="form-control">
+                    <option value="">Barcha kategoriyalar</option>
+                </select>
+                <div class="progress-summary">
+                    <span>Umumiy progress: <strong id="totalProgress">0%</strong></span>
+                </div>
+            </div>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="daily">
+                    <h2>Kunlik vazifalar</h2>
+                    <div class="task-list" id="dailyTasks"></div>
+                </div>
+
+                <div class="tab-pane" id="weekly">
+                    <h2>Haftalik vazifalar</h2>
+                    <div class="week-grid">
+                        <div class="day-column" data-day="monday">
+                            <h3>Dushanba</h3>
+                            <div class="task-list" id="mondayTasks"></div>
+                        </div>
+                        <div class="day-column" data-day="tuesday">
+                            <h3>Seshanba</h3>
+                            <div class="task-list" id="tuesdayTasks"></div>
+                        </div>
+                        <div class="day-column" data-day="wednesday">
+                            <h3>Chorshanba</h3>
+                            <div class="task-list" id="wednesdayTasks"></div>
+                        </div>
+                        <div class="day-column" data-day="thursday">
+                            <h3>Payshanba</h3>
+                            <div class="task-list" id="thursdayTasks"></div>
+                        </div>
+                        <div class="day-column" data-day="friday">
+                            <h3>Juma</h3>
+                            <div class="task-list" id="fridayTasks"></div>
+                        </div>
+                        <div class="day-column" data-day="saturday">
+                            <h3>Shanba</h3>
+                            <div class="task-list" id="saturdayTasks"></div>
+                        </div>
+                        <div class="day-column" data-day="sunday">
+                            <h3>Yakshanba</h3>
+                            <div class="task-list" id="sundayTasks"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="monthly">
+                    <h2>Oylik vazifalar</h2>
+                    <div class="month-overview">
+                        <div class="calendar-grid" id="monthlyCalendar"></div>
+                    </div>
+                    <div class="task-list" id="monthlyTasks"></div>
+                </div>
+
+                <div class="tab-pane" id="yearly">
+                    <h2>Yillik vazifalar</h2>
+                    <div class="year-overview">
+                        <div class="months-grid">
+                            <div class="month-card" data-month="1">
+                                <h3>Yanvar</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="2">
+                                <h3>Fevral</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="3">
+                                <h3>Mart</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="4">
+                                <h3>Aprel</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="5">
+                                <h3>May</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="6">
+                                <h3>Iyun</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="7">
+                                <h3>Iyul</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="8">
+                                <h3>August</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="9">
+                                <h3>Sentabr</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="10">
+                                <h3>Oktabr</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="11">
+                                <h3>Noyabr</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                            <div class="month-card" data-month="12">
+                                <h3>Dekabr</h3>
+                                <div class="task-count">0 vazifa</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-list" id="yearlyTasks"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vazifa qo'shish</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Vazifa nomi:</label>
+                    <input type="text" id="taskTitle" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">Tavsif:</label>
+                    <textarea id="taskDescription" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskCategory">Kategoriya:</label>
+                    <select id="taskCategory" class="form-control">
+                        <option value="ish">Ish</option>
+                        <option value="oqish">O'qish</option>
+                        <option value="shaxsiy">Shaxsiy</option>
+                        <option value="soglik">Sog'lik</option>
+                        <option value="oilaviy">Oilaviy</option>
+                        <option value="boshqa">Boshqa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskPriority">Muhimlik darajasi:</label>
+                    <select id="taskPriority" class="form-control">
+                        <option value="low">Past</option>
+                        <option value="medium">O'rtacha</option>
+                        <option value="high">Yuqori</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskPeriod">Muddat:</label>
+                    <select id="taskPeriod" class="form-control">
+                        <option value="daily">Kunlik</option>
+                        <option value="weekly">Haftalik</option>
+                        <option value="monthly">Oylik</option>
+                        <option value="yearly">Yillik</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDeadline">Muddat tugash vaqti:</label>
+                    <input type="datetime-local" id="taskDeadline" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskReminder">Eslatma:</label>
+                    <input type="datetime-local" id="taskReminder" class="form-control">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Bekor qilish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Assessment Modal -->
+    <div class="modal" id="assessmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>O'zini baholash</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="assessmentForm">
+                <div class="form-group">
+                    <label for="completedTask">Bajarilgan vazifa:</label>
+                    <input type="text" id="completedTask" class="form-control" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Baholash (1-5):</label>
+                    <div class="rating">
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                        <i class="fas fa-star" data-rating="4"></i>
+                        <i class="fas fa-star" data-rating="5"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="assessmentNotes">Izohlar:</label>
+                    <textarea id="assessmentNotes" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Saqlash bahosi</button>
+                    <button type="button" class="btn btn-secondary" id="cancelAssessmentBtn">Bekor qilish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Shaxsiy profil</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="profileForm">
+                <div class="profile-section">
+                    <div class="avatar-upload">
+                        <div class="avatar-preview">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <button type="button" class="btn btn-secondary">Rasmni o'zgartirish</button>
+                    </div>
+                    <div class="profile-info">
+                        <div class="form-group">
+                            <label for="profileName">Ism familiya:</label>
+                            <input type="text" id="profileName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email:</label>
+                            <input type="email" id="profileEmail" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePhone">Telefon:</label>
+                            <input type="tel" id="profilePhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileBio">Haqimda:</label>
+                            <textarea id="profileBio" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <h3>Statistika</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalTasksStat">0</div>
+                            <div class="stat-label">Jami vazifalar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="completedTasksStat">0</div>
+                            <div class="stat-label">Bajarilgan</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="completionRateStat">0%</div>
+                            <div class="stat-label">Bajarilish foizi</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="avgRatingStat">0</div>
+                            <div class="stat-label">O'rtacha baho</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                    <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Bekor qilish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
